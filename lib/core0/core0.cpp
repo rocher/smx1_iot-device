@@ -81,9 +81,11 @@ void core0_loop() {
         digitalWrite(LED_CONNECT, LOW);
     }
 
-    if (now - lastWifiCheck > WIFI_PERIOD) {
+    if (now - lastWifiCheck > CHECK_CONNECTION_PERIOD)
+    {
         lastWifiCheck = now;
-        if (!wifi_isConnected()) {
+        if (!wifi_isConnected() || !mqtt_isConnected())
+        {
             reconnect();
         }
     }

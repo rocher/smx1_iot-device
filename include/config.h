@@ -43,8 +43,8 @@ const char *MQTT_PASSWORD = SECRET_MQTT_PASSWORD;
 const char *WIFI_SSID      = SECRET_WIFI_SSID;
 const char *WIFI_PASSWORD  = SECRET_WIFI_PASSWORD;
 
-// Check WiFi connection every WIFI_PERIOD milliseconds
-const int   WIFI_PERIOD    = 15 * 1000UL;
+// Check WiFi & MQTT connection every CHECK_CONNECTION_PERIOD milliseconds
+const int   CHECK_CONNECTION_PERIOD    = 15 * 1000UL;
 
 // Reboot after WIFI_RECONNECT failed reconnection attemps
 const int   WIFI_RECONNECT = 5;

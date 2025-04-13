@@ -4,7 +4,7 @@
 extern char        SERIAL_NUMBER[];
 extern const char *WIFI_SSID;
 extern const char *WIFI_PASSWORD;
-extern const int   WIFI_PERIOD;
+extern const int CHECK_CONNECTION_PERIOD;
 extern const int   WIFI_RECONNECT;
 extern const int   WIFI_RETRIES;
 

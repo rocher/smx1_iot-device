@@ -23,7 +23,7 @@ extern const char *TOPIC_RET_TEMP_EXT;
 extern const char *TOPIC_RET_HUMIDITY;
 extern const int   TOPIC_RET_QoS;
 
-extern const int WIFI_PERIOD;
+extern const int CHECK_CONNECTION_PERIOD;
 
 void core0_setup();
 void core0_loop();
