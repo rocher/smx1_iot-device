@@ -12,7 +12,7 @@ void ntp_setup() {
 void ntp_update() {
     NTP.waitSet(NTP_TIMEOUT);
 
-    time_t now = time(nullptr);
+    time_t    now = time(nullptr);
     struct tm timeinfo;
 
     gmtime_r(&now, &timeinfo);
@@ -20,8 +20,7 @@ void ntp_update() {
     if (now < 8 * 3600 * 2) {
         Serial.println("[ntp] Could not get ntp time");
         Serial.print("[ntp] Current time: ");
-    }
-    else {
+    } else {
         Serial.println("[ntp] Time synced");
         Serial.print("[ntp] Current ntp time: ");
     }

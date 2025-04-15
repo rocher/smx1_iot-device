@@ -1,5 +1,5 @@
-#include "mqtt.h"
 #include "web.h"
+#include "mqtt.h"
 
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -25,17 +25,17 @@ void web_handleClient() {
 
 void handleIndex() {
     const int bufferSize = 640;
-    const int indexSize = bufferSize + 8 + 64 + 128;
+    const int indexSize  = bufferSize + 8 + 64 + 128;
 
     static bool init = false;
     static char buffer[bufferSize + 1];
     static char index[indexSize + 1];
 
-    if (! init) {
+    if (!init) {
         bzero(buffer, bufferSize + 1);
         File index_fmt = LittleFS.open("index.html", "r");
         if (index_fmt) {
-            index_fmt.read((uint8_t *)buffer, bufferSize);
+            index_fmt.read((uint8_t*)buffer, bufferSize);
             index_fmt.close();
         }
     }

@@ -2,7 +2,7 @@
 #define NTP_H
 
 extern const bool  LOG_ERRORS;
-extern const char *NTP_SERVER;
+extern const char* NTP_SERVER;
 extern const int   NTP_TIMEOUT;
 extern const char  TZ_DST[];
 

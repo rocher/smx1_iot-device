@@ -1,9 +1,9 @@
-#include "boot.h"
 #include "wifi.h"
+#include "boot.h"
 
 #include <WiFi.h>
 
-int wifiReconnection = 0 ;
+int wifiReconnection = 0;
 
 void wifi_setup() {
     pinMode(LED_CONNECT, OUTPUT);
@@ -41,25 +41,24 @@ void wifi_reconnect() {
     Serial.print("[wifi] Not connected, status: ");
     Serial.println(WiFi.status());
 
-    if(wifiReconnection++ > WIFI_RECONNECT){
+    if (wifiReconnection++ > WIFI_RECONNECT) {
         Serial.println("[wifi] Too many reconnection attempts, rebooting...");
         boot_reboot();
     }
 
     Serial.printf("[wifi] Connecting to '%s' (%d)\n\r",
-                  WIFI_SSID, wifiReconnection);
+        WIFI_SSID, wifiReconnection);
 
     WiFi.disconnect();
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    for(int i = 0; i < WIFI_RETRIES; i++){
+    for (int i = 0; i < WIFI_RETRIES; i++) {
         if (WiFi.status() != WL_CONNECTED) {
             digitalWrite(LED_CONNECT, HIGH);
             delay(100);
             digitalWrite(LED_CONNECT, LOW);
             delay(500);
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -70,8 +69,7 @@ void wifi_reconnect() {
         Serial.println(WiFi.localIP());
         digitalWrite(LED_CONNECT, LOW);
         wifiReconnection = 0;
-    }
-    else {
+    } else {
         Serial.println("[wifi] Failed to connect");
     }
 }

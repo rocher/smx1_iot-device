@@ -1,0 +1,10 @@
+﻿---
+BasedOnStyle: WebKit
+AlignConsecutiveMacros: 'true'
+AlignConsecutiveAssignments: 'true'
+AlignConsecutiveDeclarations: 'true'
+BreakBeforeBraces: Attach
+Standard: Auto
+UseTab: Never
+
+...

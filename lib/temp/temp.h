@@ -23,6 +23,6 @@ float temp_getDHT22Humidity();
 int   temp_getDS18B20Count();
 bool  temp_hasDS18B20(int index);
 float temp_getDS18B20Temperature(int index);
-char *temp_getDS18B20Address(int index);
+char* temp_getDS18B20Address(int index);
 
 #endif // TEMP_H

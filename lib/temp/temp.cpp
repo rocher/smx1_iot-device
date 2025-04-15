@@ -1,23 +1,26 @@
 #include "temp.h"
 
 #include <DallasTemperature.h>
-#include <SimpleDHT.h>
 #include <OneWire.h>
+#include <SimpleDHT.h>
 
 // Gestió de la temperatura amb DHT11 i DHT22
-int dhtXError[2] = {-1};
-float dhtXTemperature[2] = {0};
-float dhtXHumidity[2] = {0};
+int   dhtXError[2]       = { -1 };
+float dhtXTemperature[2] = { 0 };
+float dhtXHumidity[2]    = { 0 };
+
 SimpleDHT22 dht22(PIN_DHT22);
 SimpleDHT11 dht11(PIN_DHT11);
 
 // Gestió de la temperatura amb DS18B20
-int dsXError[3] = {-1};
-float dsXTemperature[3] = { DEVICE_DISCONNECTED_C };
+int   dsXError[3]          = { -1 };
+float dsXTemperature[3]    = { DEVICE_DISCONNECTED_C };
+char  dsXAddressStr[3][17] = { 0 };
+
 DeviceAddress dsXAddress[3];
-char dsXAddressStr[3][17] = {0};
 
 OneWire oneWire(ONE_WIRE_BUS);
+
 DallasTemperature sensors(&oneWire);
 
 void temp_setup() {
@@ -26,7 +29,7 @@ void temp_setup() {
     sensors.begin();
     sensors.setResolution(12);
     Serial.printf("[temp] sensors count = %d\n\r", sensors.getDeviceCount());
-    for (int i=0; i<sensors.getDeviceCount(); i++) {
+    for (int i = 0; i < sensors.getDeviceCount(); i++) {
         sensors.getAddress(&dsXAddress[i][0], i);
     }
 
@@ -37,13 +40,13 @@ void temp_setup() {
     // Configuració del sensor DS18B20
     sensors.begin();
 
-    for (int i=0; i<sensors.getDeviceCount(); i++) {
+    for (int i = 0; i < sensors.getDeviceCount(); i++) {
         sensors.getAddress(dsXAddress[i], i);
-        for (int j=0; j<8; j++) {
-            sprintf(&dsXAddressStr[i][j*2], "%02X", dsXAddress[i][j]);
+        for (int j = 0; j < 8; j++) {
+            sprintf(&dsXAddressStr[i][j * 2], "%02X", dsXAddress[i][j]);
         }
         Serial.printf("[temp] DS18B20 num %d: address %s\n\r",
-                      i, dsXAddressStr[i]);
+            i, dsXAddressStr[i]);
     }
 }
 
@@ -81,7 +84,7 @@ void temp_read() {
     // Llegeix la temperatura del(s) DS18B20
     sensors.requestTemperatures();
     delay(2000);
-    for (int i=0; i<sensors.getDeviceCount(); i++) {
+    for (int i = 0; i < sensors.getDeviceCount(); i++) {
         dsXTemperature[i] = sensors.getTempCByIndex(i);
     }
 
@@ -137,7 +140,7 @@ float temp_getDS18B20Temperature(int index) {
     return dsXTemperature[index];
 }
 
-char *temp_getDS18B20Address(int index) {
+char* temp_getDS18B20Address(int index) {
     if (index < 0 || index >= sensors.getDeviceCount()) {
         return NULL;
     }

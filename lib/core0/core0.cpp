@@ -1,5 +1,5 @@
-#include "boot.h"
 #include "core0.h"
+#include "boot.h"
 #include "mqtt.h"
 #include "ntp.h"
 #include "temp.h"
@@ -7,7 +7,7 @@
 
 #include <LittleFS.h>
 
-void reconnect(char *status = (char *)"reconnect") {
+void reconnect(char* status = (char*)"reconnect") {
     wifi_reconnect();
     if (wifi_isConnected()) {
         ntp_setup();
@@ -16,14 +16,14 @@ void reconnect(char *status = (char *)"reconnect") {
         if (mqtt_isConnected()) {
             mqtt_subscribe(TOPIC_CMD, TOPIC_CMD_QoS);
 
-            char payload[128];
+            char      payload[128];
             struct tm timeinfo;
-            time_t now = time(nullptr);
+            time_t    now = time(nullptr);
             gmtime_r(&now, &timeinfo);
             sprintf(payload,
                 "{\"time\": \"%s\", \"pid\": \"%s\", \"status\": \"reconnected\"}",
                 asctime(&timeinfo), SERIAL_NUMBER);
-                mqtt_publish(TOPIC_STATUS, payload, TOPIC_STATUS_QoS);
+            mqtt_publish(TOPIC_STATUS, payload, TOPIC_STATUS_QoS);
         }
     }
 }
@@ -50,7 +50,7 @@ void core0_setup() {
     wifi_setup();
     mqtt_setup();
 
-    reconnect((char *)"boot");
+    reconnect((char*)"boot");
 
     delay(10);
 }
@@ -59,8 +59,8 @@ void core0_loop() {
     unsigned long now = millis();
 
     static unsigned long lastWifiCheck = now;
-    static unsigned long lastLed = 0;
-    static PinStatus ledState = LOW;
+    static unsigned long lastLed       = 0;
+    static PinStatus     ledState      = LOW;
 
     // Run this loop every 100ms
     delay(100);
@@ -76,16 +76,13 @@ void core0_loop() {
 
     if (!wifi_isConnected() || !mqtt_isConnected()) {
         digitalWrite(LED_CONNECT, ledState);
-    }
-    else {
+    } else {
         digitalWrite(LED_CONNECT, LOW);
     }
 
-    if (now - lastWifiCheck > CHECK_CONNECTION_PERIOD)
-    {
+    if (now - lastWifiCheck > CHECK_CONNECTION_PERIOD) {
         lastWifiCheck = now;
-        if (!wifi_isConnected() || !mqtt_isConnected())
-        {
+        if (!wifi_isConnected() || !mqtt_isConnected()) {
             reconnect();
         }
     }
@@ -95,8 +92,8 @@ void core0_loop() {
     if (mqtt_receivedInternalTemperature()) {
         char payload[128];
         sprintf(payload,
-                "{\"pid\": \"%s\", \"value\": %4.2f}",
-                SERIAL_NUMBER, analogReadTemp());
+            "{\"pid\": \"%s\", \"value\": %4.2f}",
+            SERIAL_NUMBER, analogReadTemp());
         mqtt_publish(TOPIC_RET_TEMP_INT, payload, TOPIC_RET_QoS);
     }
 
@@ -105,8 +102,8 @@ void core0_loop() {
         if (temp_hasDHT11()) {
             char payload[128];
             sprintf(payload,
-                    "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
-                    SERIAL_NUMBER, temp_getDHT11Temperature());
+                "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
+                SERIAL_NUMBER, temp_getDHT11Temperature());
             mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
         }
 
@@ -114,18 +111,18 @@ void core0_loop() {
         if (temp_hasDHT22()) {
             char payload[128];
             sprintf(payload,
-                    "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
-                    SERIAL_NUMBER, temp_getDHT22Temperature());
+                "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
+                SERIAL_NUMBER, temp_getDHT22Temperature());
             mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
         }
 
         // DS18B20
-        for (int i=0; i<temp_getDS18B20Count(); i++) {
+        for (int i = 0; i < temp_getDS18B20Count(); i++) {
             if (temp_hasDS18B20(i)) {
                 char payload[128];
                 sprintf(payload,
-                        "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
-                        SERIAL_NUMBER, temp_getDS18B20Address(i), temp_getDS18B20Temperature(i));
+                    "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
+                    SERIAL_NUMBER, temp_getDS18B20Address(i), temp_getDS18B20Temperature(i));
                 mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
             }
         }
@@ -136,8 +133,8 @@ void core0_loop() {
         if (temp_hasDHT11()) {
             char payload[128];
             sprintf(payload,
-                    "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
-                    SERIAL_NUMBER, temp_getDHT11Humidity());
+                "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
+                SERIAL_NUMBER, temp_getDHT11Humidity());
             mqtt_publish(TOPIC_RET_HUMIDITY, payload, TOPIC_RET_QoS);
         }
 
@@ -145,8 +142,8 @@ void core0_loop() {
         if (temp_hasDHT22()) {
             char payload[128];
             sprintf(payload,
-                    "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
-                    SERIAL_NUMBER, temp_getDHT22Humidity());
+                "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
+                SERIAL_NUMBER, temp_getDHT22Humidity());
             mqtt_publish(TOPIC_RET_HUMIDITY, payload, TOPIC_RET_QoS);
         }
     }
@@ -155,7 +152,7 @@ void core0_loop() {
 
     if (LED_BLINK) {
         if (now - lastLed > LED_PERIOD) {
-            lastLed = now;
+            lastLed  = now;
             ledState = (ledState == LOW ? HIGH : LOW);
             digitalWrite(LED_BUILTIN, ledState);
         }

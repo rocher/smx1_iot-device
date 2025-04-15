@@ -1,5 +1,5 @@
-#include "boot.h"
 #include "mqtt.h"
+#include "boot.h"
 
 #include <ArduinoJson.h>
 #include <ArduinoMqttClient.h>
@@ -8,21 +8,21 @@
 WiFiClient wClient;
 MqttClient mqttClient(wClient);
 
-bool mustReturnTopic = false;
+bool mustReturnTopic             = false;
 bool receivedInternalTemperature = false;
 bool receivedExternalTemperature = false;
-bool receivedHumidity = false;
+bool receivedHumidity            = false;
 
 unsigned int mqttReceived = 0;
-unsigned int mqttSent = 0;
+unsigned int mqttSent     = 0;
 
 void onMqttMessage(int messageSize);
 
 void mqtt_setup() {
-    int willLength = WILL_PAYLOAD_FMT.length()-2 + SN_LENGTH + 1;
+    int  willLength = WILL_PAYLOAD_FMT.length() - 2 + SN_LENGTH + 1;
     char willPayload[willLength];
 
-    pinMode(LED_MQTT_IN,  OUTPUT);
+    pinMode(LED_MQTT_IN, OUTPUT);
     pinMode(LED_MQTT_OUT, OUTPUT);
 
     mqttClient.stop();
@@ -54,8 +54,7 @@ void mqtt_reconnect() {
     if (!mqttClient.connect(MQTT_BROKER, MQTT_PORT)) {
         Serial.print("[mqtt] Connection failed! Error code = ");
         Serial.println(mqttClient.connectError());
-    }
-    else{
+    } else {
         Serial.println("[mqtt] Connected to the MQTT broker");
     }
 }
@@ -79,10 +78,10 @@ void mqtt_startReturnTopic() {
 void mqtt_endReturnTopic() {
     if (mustReturnTopic) {
         delay(10);
-        mustReturnTopic = false;
+        mustReturnTopic             = false;
         receivedInternalTemperature = false;
         receivedExternalTemperature = false;
-        receivedHumidity = false;
+        receivedHumidity            = false;
         digitalWrite(LED_MQTT_OUT, LOW);
     }
 }
@@ -100,9 +99,9 @@ bool mqtt_receivedHumidity() {
 }
 
 void mqtt_publish(const char* topic,
-                  const char* payload,
-                  int         qos,
-                  bool        retained) {
+    const char*               payload,
+    int                       qos,
+    bool                      retained) {
     mqttClient.beginMessage(topic, retained, qos, false);
     mqttClient.print(payload);
     mqttClient.endMessage();
@@ -134,23 +133,18 @@ void onMqttMessage(int messageSize) {
 
     if (cmd == CMD_REBOOT) {
         boot_reboot();
-    }
-    else if (cmd == CMD_REBOOT_LOAD) {
+    } else if (cmd == CMD_REBOOT_LOAD) {
         boot_rebootToBootloader();
-    }
-    else if (cmd == CMD_TEMP_INT) {
-        mustReturnTopic = true;
+    } else if (cmd == CMD_TEMP_INT) {
+        mustReturnTopic             = true;
         receivedInternalTemperature = true;
-    }
-    else if (cmd == CMD_TEMP_EXT) {
-        mustReturnTopic = true;
+    } else if (cmd == CMD_TEMP_EXT) {
+        mustReturnTopic             = true;
         receivedExternalTemperature = true;
-    }
-    else if (cmd == CMD_HUMIDITY) {
-        mustReturnTopic = true;
+    } else if (cmd == CMD_HUMIDITY) {
+        mustReturnTopic  = true;
         receivedHumidity = true;
-    }
-    else {
+    } else {
         Serial.print("[mqtt] Unknown command: ");
         Serial.println(cmd);
     }
