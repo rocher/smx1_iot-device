@@ -1,5 +1,6 @@
 #include "wifi.h"
 #include "boot.h"
+#include "setup.h"
 
 #include <WiFi.h>
 
@@ -10,7 +11,7 @@ void wifi_setup() {
     digitalWrite(LED_CONNECT, HIGH);
 
     WiFi.mode(WIFI_STA);
-    WiFi.setHostname(SERIAL_NUMBER);
+    WiFi.setHostname(setup_getName(SERIAL_NUMBER));
 }
 
 bool wifi_isConnected() {

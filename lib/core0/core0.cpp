@@ -2,10 +2,14 @@
 #include "boot.h"
 #include "mqtt.h"
 #include "ntp.h"
+#include "setup.h"
 #include "temp.h"
 #include "wifi.h"
 
 #include <LittleFS.h>
+
+const char* DHT11 = "dht11";
+const char* DHT22 = "dht22";
 
 void reconnect(char* status = (char*)"reconnect") {
     wifi_reconnect();
@@ -15,6 +19,7 @@ void reconnect(char* status = (char*)"reconnect") {
         mqtt_reconnect();
         if (mqtt_isConnected()) {
             mqtt_subscribe(TOPIC_CMD, TOPIC_CMD_QoS);
+            mqtt_subscribe(TOPIC_SETUP, TOPIC_SETUP_QoS);
 
             char      payload[128];
             struct tm timeinfo;
@@ -22,7 +27,7 @@ void reconnect(char* status = (char*)"reconnect") {
             gmtime_r(&now, &timeinfo);
             sprintf(payload,
                 "{\"time\": \"%s\", \"pid\": \"%s\", \"status\": \"reconnected\"}",
-                asctime(&timeinfo), SERIAL_NUMBER);
+                asctime(&timeinfo), setup_getName(SERIAL_NUMBER));
             mqtt_publish(TOPIC_STATUS, payload, TOPIC_STATUS_QoS);
         }
     }
@@ -46,6 +51,7 @@ void core0_setup() {
     Serial.printf("[setup] %s %s\n\r", PROGRAM_NAME, PROGRAM_VERSION);
     Serial.printf("[setup] S/N: 0x%s\n\r", SERIAL_NUMBER);
 
+    setup_load();
     boot_setup();
     wifi_setup();
     mqtt_setup();
@@ -93,7 +99,7 @@ void core0_loop() {
         char payload[128];
         sprintf(payload,
             "{\"pid\": \"%s\", \"value\": %4.2f}",
-            SERIAL_NUMBER, analogReadTemp());
+            setup_getName(SERIAL_NUMBER), analogReadTemp());
         mqtt_publish(TOPIC_RET_TEMP_INT, payload, TOPIC_RET_QoS);
     }
 
@@ -102,8 +108,9 @@ void core0_loop() {
         if (temp_hasDHT11()) {
             char payload[128];
             sprintf(payload,
-                "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
-                SERIAL_NUMBER, temp_getDHT11Temperature());
+                "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
+                setup_getName(SERIAL_NUMBER), setup_getName(DHT11).c_str(),
+                temp_getDHT11Temperature());
             mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
         }
 
@@ -111,8 +118,9 @@ void core0_loop() {
         if (temp_hasDHT22()) {
             char payload[128];
             sprintf(payload,
-                "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
-                SERIAL_NUMBER, temp_getDHT22Temperature());
+                "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
+                setup_getName(SERIAL_NUMBER), setup_getName(DHT22).c_str(),
+                temp_getDHT22Temperature());
             mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
         }
 
@@ -122,7 +130,9 @@ void core0_loop() {
                 char payload[128];
                 sprintf(payload,
                     "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
-                    SERIAL_NUMBER, temp_getDS18B20Address(i), temp_getDS18B20Temperature(i));
+                    setup_getName(SERIAL_NUMBER),
+                    setup_getName(temp_getDS18B20Address(i)),
+                    temp_getDS18B20Temperature(i));
                 mqtt_publish(TOPIC_RET_TEMP_EXT, payload, TOPIC_RET_QoS);
             }
         }
@@ -133,8 +143,9 @@ void core0_loop() {
         if (temp_hasDHT11()) {
             char payload[128];
             sprintf(payload,
-                "{\"pid\": \"%s\", \"tid\": \"dht11\", \"value\": %f}",
-                SERIAL_NUMBER, temp_getDHT11Humidity());
+                "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
+                setup_getName(SERIAL_NUMBER), setup_getName(DHT11).c_str(),
+                temp_getDHT11Humidity());
             mqtt_publish(TOPIC_RET_HUMIDITY, payload, TOPIC_RET_QoS);
         }
 
@@ -142,8 +153,9 @@ void core0_loop() {
         if (temp_hasDHT22()) {
             char payload[128];
             sprintf(payload,
-                "{\"pid\": \"%s\", \"tid\": \"dht22\", \"value\": %f}",
-                SERIAL_NUMBER, temp_getDHT22Humidity());
+                "{\"pid\": \"%s\", \"tid\": \"%s\", \"value\": %f}",
+                setup_getName(SERIAL_NUMBER), setup_getName(DHT22).c_str(),
+                temp_getDHT22Humidity());
             mqtt_publish(TOPIC_RET_HUMIDITY, payload, TOPIC_RET_QoS);
         }
     }

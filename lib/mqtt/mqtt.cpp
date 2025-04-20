@@ -1,5 +1,6 @@
 #include "mqtt.h"
 #include "boot.h"
+#include "setup.h"
 
 #include <ArduinoJson.h>
 #include <ArduinoMqttClient.h>
@@ -29,7 +30,7 @@ void mqtt_setup() {
     delay(20);
 
     mqttClient.beginWill(WILL_TOPIC, willLength, WILL_RETAIN, WILL_QoS);
-    sprintf(willPayload, WILL_PAYLOAD_FMT.c_str(), SERIAL_NUMBER);
+    sprintf(willPayload, WILL_PAYLOAD_FMT.c_str(), setup_getName(SERIAL_NUMBER));
     mqttClient.print(willPayload);
     mqttClient.endWill();
 
@@ -126,27 +127,75 @@ void onMqttMessage(int messageSize) {
 
     StaticJsonDocument<256> doc;
     deserializeJson(doc, mqttClient);
-    String cmd = doc["cmd"];
 
     // Serial.print("mqtt cmd: ");
     // Serial.println(cmd);
 
-    if (cmd == CMD_REBOOT) {
-        boot_reboot();
-    } else if (cmd == CMD_REBOOT_LOAD) {
-        boot_rebootToBootloader();
-    } else if (cmd == CMD_TEMP_INT) {
-        mustReturnTopic             = true;
-        receivedInternalTemperature = true;
-    } else if (cmd == CMD_TEMP_EXT) {
-        mustReturnTopic             = true;
-        receivedExternalTemperature = true;
-    } else if (cmd == CMD_HUMIDITY) {
-        mustReturnTopic  = true;
-        receivedHumidity = true;
+    if (topic == TOPIC_CMD) {
+        // Serial.print("[mqtt] Command: ");
+        String cmd = doc["cmd"];
+        if (cmd == CMD_REBOOT) {
+            boot_reboot();
+        } else if (cmd == CMD_REBOOT_LOAD) {
+            boot_rebootToBootloader();
+        } else if (cmd == CMD_TEMP_INT) {
+            mustReturnTopic             = true;
+            receivedInternalTemperature = true;
+        } else if (cmd == CMD_TEMP_EXT) {
+            mustReturnTopic             = true;
+            receivedExternalTemperature = true;
+        } else if (cmd == CMD_HUMIDITY) {
+            mustReturnTopic  = true;
+            receivedHumidity = true;
+        } else {
+            Serial.print("[mqtt] Unknown command: ");
+            Serial.println(cmd);
+        }
+    } else if (topic == TOPIC_SETUP) {
+        String cmd = doc["cmd"];
+        // Serial.print("[mqtt] Setup ");
+        // Serial.println(cmd);
+        if (cmd == "set") {
+            String pid = doc["pid"];
+            if (pid = SERIAL_NUMBER) {
+                String key   = doc["key"];
+                String value = doc["value"];
+                Serial.print("[mqtt] Setup set ");
+                Serial.print(key.c_str());
+                Serial.print(": ");
+                Serial.println(value.c_str());
+                setup_setName(key, value);
+            }
+        } else if (cmd == "get") {
+            String pid = doc["pid"];
+            if (pid = SERIAL_NUMBER) {
+                String key   = doc["key"];
+                String value = setup_getName(key);
+                Serial.print("[mqtt] Setup get ");
+                Serial.print(key);
+                Serial.print(" = ");
+                Serial.println(value);
+                mqtt_publish(TOPIC_SETUP, value.c_str(), TOPIC_SETUP_QoS);
+            }
+        } else if (cmd == "clear") {
+            String pid = doc["pid"];
+            Serial.println("[mqtt] Setup clear");
+            if (pid = SERIAL_NUMBER) {
+                setup_clear();
+            }
+        } else if (cmd == "save") {
+            String pid = doc["pid"];
+            if (pid = SERIAL_NUMBER) {
+                Serial.println("[mqtt] Setup save");
+                setup_save();
+            }
+        } else {
+            Serial.print("[mqtt] Unknown setup command: ");
+            Serial.println(cmd);
+        }
     } else {
-        Serial.print("[mqtt] Unknown command: ");
-        Serial.println(cmd);
+        Serial.print("[mqtt] Unknown topic: ");
+        Serial.println(topic);
     }
 
     delay(10);

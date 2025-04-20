@@ -1,5 +1,6 @@
 #include "web.h"
 #include "mqtt.h"
+#include "setup.h"
 
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -39,7 +40,7 @@ void handleIndex() {
             index_fmt.close();
         }
     }
-    sprintf(index, buffer, SERIAL_NUMBER,
+    sprintf(index, buffer, setup_getName(SERIAL_NUMBER),
         mqtt_receivedMessages(), mqtt_sentMessages());
     Serial.println("[web] 200: Sending index");
     server.send(200, "text/html", index);

@@ -17,6 +17,9 @@ extern const char* MQTT_PASSWORD;
 extern const char* TOPIC_CMD;
 extern const int   TOPIC_CMD_QoS;
 
+extern const char* TOPIC_SETUP;
+extern const int   TOPIC_SETUP_QoS;
+
 extern const char* TOPIC_STATUS;
 extern const int   TOPIC_STATUS_QoS;
 
