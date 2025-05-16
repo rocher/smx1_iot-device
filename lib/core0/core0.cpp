@@ -47,9 +47,9 @@ void core0_setup() {
     // while (! Serial.available()) {}
     delay(5000);
 
-    Serial.println("[setup] -----------------------------------------------");
-    Serial.printf("[setup] %s %s\n\r", PROGRAM_NAME, PROGRAM_VERSION);
-    Serial.printf("[setup] S/N: 0x%s\n\r", SERIAL_NUMBER);
+    Serial.println("\n\r------------------------------------------------------");
+    Serial.printf("[core0] %s %s\n\r", PROGRAM_NAME, PROGRAM_VERSION);
+    Serial.printf("[core0] S/N: %s\n\r", SERIAL_NUMBER);
 
     setup_load();
     boot_setup();
