@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "config_radio.h" // #define USE_LORA_RADIO
 #include "secrets.h"
 
 #define STR_HELPER(x) #x
@@ -12,20 +13,6 @@
 
 #include <Arduino.h>
 #include <pico/unique_id.h>
-
-//  Define the LoRa board type.
-//
-//  Uncomment the following line to use Waveshare Pico-LoRa-SX1262 board If
-//  you are using a different board, comment this line out and define the
-//  correct board For example, if you are using a Feather RP2040 with RFM95,
-//  you would define RADIO_BOARD_FEATHER_RP2040 instead. If you are using a
-//  different board, you can define it in RadioBoards.h or RadioBoards.cpp, or
-//  you can define it in your own code.
-//
-// Used in conjunction with RadioBoards library, with modifications from
-// https://github.com/radiolib-org/RadioBoards/blob/main/src/contributed/Waveshare/RP2040_LoRa.h
-//
-#define WAVESHARE_PICO_LORA_SX1262_433
 
 const char TZ_DST[] = "UTC-2"; // Timezone for Barcelona
 
@@ -73,7 +60,7 @@ const int WIFI_RETRIES = 25;
 const bool LED_BLINK  = true;
 const int  LED_PERIOD = 2 * 1000UL;
 
-#if defined(WAVESHARE_PICO_LORA_SX1262_433)
+#ifdef WAVESHARE_PICO_LORA_SX1262_433
 
 // Pins distributed according to Rapberry Pi Pico pinout and Waveshare
 // Pico-LoRa-SX1262:

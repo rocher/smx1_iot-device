@@ -30,6 +30,10 @@ void radio_setFlag(void) {
     operationDone = true;
 }
 
+bool radio_isAwake() {
+    return !sleepMode;
+}
+
 void radio_setup() {
 
     // Radio setup according to Waveshare Pico-LoRa-SX1262:
